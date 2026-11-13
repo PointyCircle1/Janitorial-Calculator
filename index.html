@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Building Profit Checker</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+            background-color: #ffffff;
+            color: #1a1f2e;
+            padding: 24px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            transition: background-color 0.4s ease;
+        }
+        .container {
+            width: 100%;
+            max-width: 560px;
+        }
+        h1 {
+            font-size: 26px;
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 8px;
+            color: #1a1f2e;
+        }
+        .subheadline {
+            font-size: 16px;
+            color: #5a6478;
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+        .card {
+            background: #ffffff;
+            border: 1px solid #dde1e8;
+            border-radius: 10px;
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 16px;
+        }
+        .form-group:last-child {
+            margin-bottom: 0;
+        }
+        label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1f2e;
+            margin-bottom: 6px;
+        }
+        .helper-text {
+            font-size: 12px;
+            color: #7a8499;
+            margin-bottom: 6px;
+            line-height: 1.3;
+        }
+        input[type="text"],
+        input[type="number"],
+        input[type="email"] {
+            width: 100%;
+            font-size: 16px;
+            padding: 10px 12px;
+            border: 1px solid #c8cedb;
+            border-radius: 6px;
+            background: #ffffff;
+            color: #1a1f2e;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        input:focus {
+            border-color: #1f4e8c;
+        }
+        /* Results Card */
+        .results-card {
+            display: none;
+        }
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 12px 0;
+            border-bottom: 1px solid #dde1e8;
+        }
+        .result-row:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+        .result-row:first-child {
+            padding-top: 0;
+        }
+        .result-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #5a6478;
+        }
+        .result-value {
+            font-size: 18px;
+            font-weight: 700;
+            text-align: right;
+            margin-left: 12px;
+        }
+        .text-green {
+            color: #1a7f4b;
+        }
+        .text-red {
+            color: #c0281f;
+        }
+        .text-neutral {
+            color: #1a1f2e;
+        }
+        .verdict-banner {
+            margin-top: 20px;
+            padding: 18px;
+            border-radius: 8px;
+            font-size: 17px;
+            font-weight: 700;
+            line-height: 1.4;
+        }
+        .verdict-red {
+            background-color: #fdeceb;
+            color: #c0281f;
+        }
+        .verdict-green {
+            background-color: #e8f5ee;
+            color: #1a7f4b;
+        }
+        .drift-subline {
+            margin-top: 8px;
+            font-size: 15px;
+            font-weight: 700;
+            color: #c0281f;
+        }
+        .renewal-box {
+            margin-top: 16px;
+            padding: 14px;
+            background-color: #f4f5f7;
+            border: 1px solid #c8cedb;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 700;
+            color: #1a1f2e;
+            text-align: center;
+        }
+        /* Email Capture Block */
+        .email-block {
+            display: none;
+        }
+        .email-block h2 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #1a1f2e;
+        }
+        .email-block p {
+            font-size: 15px;
+            color: #5a6478;
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+        .btn {
+            display: block;
+            width: 100%;
+            background-color: #1f4e8c;
+            color: #ffffff;
+            font-size: 16px;
+            font-weight: 600;
+            padding: 14px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            text-align: center;
+            transition: background-color 0.2s;
+            margin-top: 16px;
+        }
+        .btn:hover:not(:disabled) {
+            background-color: #173d6e;
+        }
+        .btn:disabled {
+            opacity: 0.65;
+            cursor: not-allowed;
+        }
+        .confirmation-block {
+            display: none;
+            background-color: #e8f5ee;
+            color: #1a7f4b;
+            padding: 16px;
+            border-radius: 6px;
+            font-weight: 600;
+            text-align: center;
+            margin-top: 16px;
+        }
+        .error-block {
+            display: none;
+            background-color: #fdeceb;
+            color: #c0281f;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            text-align: center;
+            margin-top: 12px;
+        }
+        .footer {
+            font-size: 12px;
+            color: #8a93a6;
+            text-align: center;
+            margin-top: 24px;
+        }
+        @media (max-width: 560px) {
+            body {
+                padding: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Find out what a building is really costing you.</h1>
+        <p class="subheadline">Enter your bid and your actual hours. See your true profit per building in 30 seconds.</p>
+
+        <!-- Input Form Card -->
+        <div class="card">
+            <div class="form-group">
+                <label for="buildingName">Building name (optional)</label>
+                <input type="text" id="buildingName" placeholder="" maxlength="100">
+            </div>
+            <div class="form-group">
+                <label for="contractPrice">Monthly contract price ($)</label>
+                <input type="number" id="contractPrice" value="1500" step="1" min="1">
+            </div>
+            <div class="form-group">
+                <label for="bidHours">Bid hours per visit</label>
+                <input type="number" id="bidHours" value="2.0" step="0.1" min="0">
+            </div>
+            <div class="form-group">
+                <label for="actualHours">Actual hours per visit</label>
+                <input type="number" id="actualHours" value="2.4" step="0.1" min="0.1">
+            </div>
+            <div class="form-group">
+                <label for="visitsPerWeek">Visits per week</label>
+                <input type="number" id="visitsPerWeek" value="5" step="1" min="1">
+            </div>
+            <div class="form-group">
+                <label for="hourlyRate">Hourly labor cost ($)</label>
+                <div class="helper-text">Your wage plus roughly 25–35% for taxes, insurance and workers' comp. If unsure, use your wage × 1.3.</div>
+                <input type="number" id="hourlyRate" value="22" step="1" min="1">
+            </div>
+            <div class="form-group">
+                <label for="overheadPercent">Supplies & Overhead (%)</label>
+                <div class="helper-text">Industry average is 20%. This covers supplies, insurance, and office costs.</div>
+                <input type="number" id="overheadPercent" value="20" step="1" min="0" max="95">
+            </div>
+            <div class="form-group">
+                <label for="targetMarginPercent">Target Profit Margin (%)</label>
+                <div class="helper-text">The net profit you want to keep after labor and overhead. Industry average is 10%–15%.</div>
+                <input type="number" id="targetMarginPercent" value="15" step="1" min="1" max="95">
+            </div>
+        </div>
+
+        <!-- Results Card -->
+        <div class="card results-card" id="resultsCard" aria-live="polite">
+            <div class="result-row">
+                <span class="result-label">Monthly labor cost</span>
+                <span class="result-value text-neutral" id="resLabourCost">—</span>
+            </div>
+            <div class="result-row">
+                <span class="result-label">Monthly overhead & supplies</span>
+                <span class="result-value text-neutral" id="resOverheadCost">—</span>
+            </div>
+            <div class="result-row">
+                <span class="result-label">True Monthly Profit</span>
+                <span class="result-value" id="resTrueProfit">—</span>
+            </div>
+            <div class="result-row">
+                <span class="result-label">Profit Margin</span>
+                <span class="result-value" id="resMarginPercent">—</span>
+            </div>
+            <div class="result-row">
+                <span class="result-label">Time over budget</span>
+                <span class="result-value text-neutral" id="resTimeOver">—</span>
+            </div>
+
+            <div id="verdictBanner" class="verdict-banner"></div>
+            
+            <div id="renewalBox" class="renewal-box"></div>
+        </div>
+
+        <!-- Email Capture Block -->
+        <div class="card email-block" id="emailBlock">
+            <h2>Want this across all your buildings, automated?</h2>
+            <p>A full version is being built that does this automatically across every site. It will track actual hours versus bid hours, flag buildings that are slipping, and generate client proof-of-work.</p>
+            <p>Leave your email for early access when it's ready. No spam, no sales calls, unsubscribe anytime.</p>
+            
+            <div class="form-group" id="emailGroup">
+                <label for="userEmail">Email</label>
+                <input type="email" id="userEmail" placeholder="your@email.com">
+            </div>
+            <div class="form-group" id="buildingsGroup">
+                <label for="buildingCount">How many buildings do you run? (optional)</label>
+                <input type="number" id="buildingCount" step="1" min="1">
+            </div>
+            <button type="button" class="btn" id="submitBtn">Send me early access</button>
+            <div class="error-block" id="errorBlock"></div>
+            <div class="confirmation-block" id="confirmationBlock">
+                Thanks. You're on the list. I'll reach out personally when it's ready.
+            </div>
+        </div>
+
+        <div class="footer">Rinsemark Building Profit Checker</div>
+    </div>
+
+    <script>
+        const buildingNameInput = document.getElementById('buildingName');
+        const contractPriceInput = document.getElementById('contractPrice');
+        const bidHoursInput = document.getElementById('bidHours');
+        const actualHoursInput = document.getElementById('actualHours');
+        const visitsPerWeekInput = document.getElementById('visitsPerWeek');
+        const hourlyRateInput = document.getElementById('hourlyRate');
+        const overheadPercentInput = document.getElementById('overheadPercent');
+        const targetMarginPercentInput = document.getElementById('targetMarginPercent');
+
+        const resultsCard = document.getElementById('resultsCard');
+        const emailBlock = document.getElementById('emailBlock');
+
+        const resLabourCost = document.getElementById('resLabourCost');
+        const resOverheadCost = document.getElementById('resOverheadCost');
+        const resTrueProfit = document.getElementById('resTrueProfit');
+        const resMarginPercent = document.getElementById('resMarginPercent');
+        const resTimeOver = document.getElementById('resTimeOver');
+        const verdictBanner = document.getElementById('verdictBanner');
+        const renewalBox = document.getElementById('renewalBox');
+
+        const userEmailInput = document.getElementById('userEmail');
+        const buildingCountInput = document.getElementById('buildingCount');
+        const submitBtn = document.getElementById('submitBtn');
+        const confirmationBlock = document.getElementById('confirmationBlock');
+        const errorBlock = document.getElementById('errorBlock');
+
+        const emailGroup = document.getElementById('emailGroup');
+        const buildingsGroup = document.getElementById('buildingsGroup');
+
+        let userHasTyped = false;
+
+        function formatMoney(amount) {
+            const num = Number(amount);
+            const sign = num < 0 ? '-' : '';
+            const formatted = Math.abs(num).toLocaleString('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+            return sign + '$' + formatted;
+        }
+
+        function formatPercent(pct) {
+            return Number(pct).toFixed(1) + '%';
+        }
+
+        function calculate() {
+            const priceVal = parseFloat(contractPriceInput.value);
+            const bidVal = parseFloat(bidHoursInput.value);
+            const actualVal = parseFloat(actualHoursInput.value);
+            const visitsVal = parseFloat(visitsPerWeekInput.value);
+            const rateVal = parseFloat(hourlyRateInput.value);
+            const overheadVal = parseFloat(overheadPercentInput.value);
+            const targetMarginVal = parseFloat(targetMarginPercentInput.value);
+
+            if (
+                isNaN(priceVal) || priceVal <= 0 ||
+                isNaN(actualVal) || actualVal <= 0 ||
+                isNaN(visitsVal) || visitsVal <= 0 ||
+                isNaN(rateVal) || rateVal <= 0 ||
+                isNaN(overheadVal) || overheadVal < 0 ||
+                isNaN(targetMarginVal) || targetMarginVal <= 0
+            ) {
+                resultsCard.style.display = 'none';
+                emailBlock.style.display = 'none';
+                document.body.style.backgroundColor = '#ffffff';
+                return;
+            }
+
+            resultsCard.style.display = 'block';
+            emailBlock.style.display = 'block';
+
+            const laborCost = actualVal * visitsVal * 4.33 * rateVal;
+            const overheadCost = priceVal * (overheadVal / 100);
+            const trueProfit = priceVal - laborCost - overheadCost;
+            const trueMarginPercent = (trueProfit / priceVal) * 100;
+
+            const laborDriftHours = (!isNaN(bidVal) && bidVal >= 0) ? (actualVal - bidVal) : 0;
+            const monthlyDriftCost = laborDriftHours * visitsVal * 4.33 * rateVal;
+            const annualDriftCost = monthlyDriftCost * 12;
+
+            resLabourCost.textContent = formatMoney(laborCost);
+            resOverheadCost.textContent = formatMoney(overheadCost);
+
+            resTrueProfit.textContent = formatMoney(trueProfit);
+            resTrueProfit.className = 'result-value ' + (trueProfit < 0 ? 'text-red' : 'text-green');
+
+            resMarginPercent.textContent = formatPercent(trueMarginPercent);
+            resMarginPercent.className = 'result-value ' + (trueProfit < 0 ? 'text-red' : 'text-green');
+
+            if (!isNaN(bidVal) && bidVal > 0) {
+                const diff = actualVal - bidVal;
+                const sign = diff > 0 ? '+' : (diff < 0 ? '−' : '');
+                resTimeOver.textContent = sign + Math.abs(diff).toFixed(1) + ' hrs per visit';
+                resTimeOver.className = 'result-value ' + (diff > 0 ? 'text-red' : (diff < 0 ? 'text-green' : 'text-neutral'));
+            } else {
+                resTimeOver.textContent = '—';
+                resTimeOver.className = 'result-value text-neutral';
+            }
+
+            // Safely build verdict banner using DOM text nodes (XSS-safe)
+            const rawBuildingName = buildingNameInput.value.trim();
+            const siteLabel = rawBuildingName.length > 0 ? rawBuildingName : 'This building';
+
+            verdictBanner.replaceChildren();
+
+            if (trueProfit < 0) {
+                document.body.style.backgroundColor = userHasTyped ? '#f1948a' : '#ffffff';
+                verdictBanner.className = 'verdict-banner verdict-red';
+
+                const mainLine = document.createTextNode(
+                    `${siteLabel} is losing you ${formatMoney(Math.abs(trueProfit))} a month.`
+                );
+                verdictBanner.appendChild(mainLine);
+
+                if (monthlyDriftCost > 0) {
+                    const driftDiv = document.createElement('div');
+                    driftDiv.className = 'drift-subline';
+                    driftDiv.textContent = `Running over your bid is costing you an extra ${formatMoney(monthlyDriftCost)} a month (${formatMoney(Math.abs(annualDriftCost))} a year).`;
+                    verdictBanner.appendChild(driftDiv);
+                }
+            } else {
+                document.body.style.backgroundColor = userHasTyped ? '#82e0aa' : '#ffffff';
+                verdictBanner.className = 'verdict-banner verdict-green';
+                verdictBanner.textContent = `${siteLabel} is profitable. You are making ${formatMoney(trueProfit)} a month.`;
+            }
+
+            // Scaled renewal price formula with division-by-zero & impossible margin guardrail
+            const combinedDeductionDecimal = (overheadVal + targetMarginVal) / 100;
+
+            if (combinedDeductionDecimal >= 0.99) {
+                renewalBox.textContent = `Overhead (${overheadVal}%) + Target Margin (${targetMarginVal}%) cannot equal or exceed 99%. Lower one of them to calculate a valid renewal price.`;
+            } else {
+                const renewalPriceUnrounded = laborCost / (1 - combinedDeductionDecimal);
+                const renewalPrice = Math.round(renewalPriceUnrounded / 10) * 10;
+                renewalBox.textContent = `To make a ${targetMarginVal}% net profit at these actual hours (accounting for ${overheadVal}% overhead), you need to charge ${formatMoney(renewalPrice)} a month at renewal.`;
+            }
+        }
+
+        [
+            buildingNameInput,
+            contractPriceInput,
+            bidHoursInput,
+            actualHoursInput,
+            visitsPerWeekInput,
+            hourlyRateInput,
+            overheadPercentInput,
+            targetMarginPercentInput
+        ].forEach(input => {
+            input.addEventListener('input', () => {
+                userHasTyped = true;
+                calculate();
+            });
+        });
+
+        calculate();
+
+        submitBtn.addEventListener('click', async () => {
+            const email = userEmailInput.value.trim();
+            const buildings = buildingCountInput.value ? parseInt(buildingCountInput.value, 10) : null;
+
+            errorBlock.style.display = 'none';
+
+            if (!email || !email.includes('@')) {
+                errorBlock.textContent = 'Please enter a valid email address.';
+                errorBlock.style.display = 'block';
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Sending...';
+
+            try {
+                const response = await fetch('https://formspree.io/f/xjywvazw', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ email, buildings })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Submission failed');
+                }
+
+                emailGroup.style.display = 'none';
+                buildingsGroup.style.display = 'none';
+                submitBtn.style.display = 'none';
+                confirmationBlock.style.display = 'block';
+            } catch (err) {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Send me early access';
+                errorBlock.textContent = 'Something went wrong sending your request. Please try again.';
+                errorBlock.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>
