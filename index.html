@@ -216,9 +216,88 @@
             text-align: center;
             margin-top: 24px;
         }
+        .privacy-trigger {
+            background: none;
+            border: none;
+            padding: 0;
+            font: inherit;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+        /* Privacy Modal Popup */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(26, 31, 46, 0.55);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .modal-overlay.open {
+            display: flex;
+        }
+        .modal-dialog {
+            background: #ffffff;
+            border: 1px solid #dde1e8;
+            border-radius: 10px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 28px;
+            position: relative;
+            line-height: 1.6;
+            color: #1a1f2e;
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 6px;
+        }
+        .modal-dialog h2 {
+            font-size: 22px;
+            font-weight: 700;
+            color: #1a1f2e;
+        }
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            line-height: 1;
+            color: #5a6478;
+            cursor: pointer;
+            padding: 2px 6px;
+        }
+        .modal-close:hover {
+            color: #1a1f2e;
+        }
+        .modal-updated {
+            font-size: 13px;
+            color: #7a8499;
+            margin-bottom: 18px;
+        }
+        .modal-dialog h3 {
+            font-size: 16px;
+            font-weight: 700;
+            margin-top: 18px;
+            margin-bottom: 6px;
+            color: #1a1f2e;
+        }
+        .modal-dialog p {
+            font-size: 14px;
+            margin-bottom: 12px;
+            color: #3a4254;
+        }
         @media (max-width: 560px) {
             body {
                 padding: 16px;
+            }
+            .modal-dialog {
+                padding: 20px;
             }
         }
     </style>
@@ -232,7 +311,7 @@
         <div class="card">
             <div class="form-group">
                 <label for="buildingName">Building name (optional)</label>
-                <input type="text" id="buildingName" placeholder="" maxlength="100">
+                <input type="text" id="buildingName" placeholder="e.g. Raffles Place branch" maxlength="100">
             </div>
             <div class="form-group">
                 <label for="contractPrice">Monthly contract price ($)</label>
@@ -300,6 +379,7 @@
             <h2>Want this across all your buildings, automated?</h2>
             <p>A full version is being built that does this automatically across every site. It will track actual hours versus bid hours, flag buildings that are slipping, and generate client proof-of-work.</p>
             <p>Leave your email for early access when it's ready. No spam, no sales calls, unsubscribe anytime.</p>
+            <p style="font-size: 12px; color: #7a8499; margin-bottom: 12px;">By submitting, you agree to our <button type="button" class="privacy-trigger" data-open-privacy style="color: #1f4e8c;">Privacy Policy</button>.</p>
             
             <div class="form-group" id="emailGroup">
                 <label for="userEmail">Email</label>
@@ -316,7 +396,35 @@
             </div>
         </div>
 
-        <div class="footer">Rinsemark Building Profit Checker</div>
+        <div class="footer">Rinsemark Building Profit Checker | <button type="button" class="privacy-trigger" data-open-privacy style="color: #8a93a6;">Privacy Policy</button></div>
+    </div>
+
+    <!-- Privacy Policy Modal Popup -->
+    <div class="modal-overlay" id="privacyModal" role="dialog" aria-modal="true" aria-labelledby="privacyModalTitle">
+        <div class="modal-dialog">
+            <div class="modal-header">
+                <h2 id="privacyModalTitle">Privacy Policy</h2>
+                <button type="button" class="modal-close" id="closePrivacyBtn" aria-label="Close Privacy Policy">&times;</button>
+            </div>
+            <p class="modal-updated">Last updated: November 2026</p>
+
+            <h3>1. Calculator Data Stays in Your Browser</h3>
+            <p>All numbers you enter into the Building Profit Checker (including contract prices, labor hours, hourly rates, overhead percentages, and building names) are calculated entirely inside your web browser. We do not collect, store, or transmit your financial or building inputs to our servers.</p>
+
+            <h3>2. Information We Collect</h3>
+            <p>If you choose to join our early access list, we collect only the information you voluntarily submit in the sign-up form: your email address and, optionally, the number of buildings you manage.</p>
+
+            <h3>3. How We Use Your Information</h3>
+            <p>We use your email address solely to notify you when the full Rinsemark platform is ready and to share relevant product updates. We do not sell, rent, or share your email address with third-party marketers.</p>
+
+            <h3>4. Third-Party Services</h3>
+            <p>Early access form submissions are processed securely through Formspree solely for the purpose of delivering your sign-up details to us.</p>
+
+            <h3>5. Unsubscribing &amp; Data Deletion</h3>
+            <p>You can unsubscribe from updates or request that we delete your email address from our list at any time by replying directly to any email we send you.</p>
+
+            <button type="button" class="btn" id="closePrivacyBottomBtn" style="margin-top: 20px;">← Back to the Calculator</button>
+        </div>
     </div>
 
     <script>
@@ -514,6 +622,39 @@
                 submitBtn.textContent = 'Send me early access';
                 errorBlock.textContent = 'Something went wrong sending your request. Please try again.';
                 errorBlock.style.display = 'block';
+            }
+        });
+
+        // Privacy Policy Modal Logic
+        const privacyModal = document.getElementById('privacyModal');
+        const closePrivacyBtn = document.getElementById('closePrivacyBtn');
+        const closePrivacyBottomBtn = document.getElementById('closePrivacyBottomBtn');
+        const privacyTriggers = document.querySelectorAll('[data-open-privacy]');
+
+        function openPrivacyModal() {
+            privacyModal.classList.add('open');
+        }
+
+        function closePrivacyModal() {
+            privacyModal.classList.remove('open');
+        }
+
+        privacyTriggers.forEach(trigger => {
+            trigger.addEventListener('click', openPrivacyModal);
+        });
+
+        closePrivacyBtn.addEventListener('click', closePrivacyModal);
+        closePrivacyBottomBtn.addEventListener('click', closePrivacyModal);
+
+        privacyModal.addEventListener('click', (e) => {
+            if (e.target === privacyModal) {
+                closePrivacyModal();
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && privacyModal.classList.contains('open')) {
+                closePrivacyModal();
             }
         });
     </script>
